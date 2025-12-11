@@ -13,7 +13,8 @@ pygame.display.set_caption("Chess")
 WHITE = (240, 217, 181)
 BROWN = (181, 136, 99)
 BLACK = (0, 0, 0)
-DOT_COLOR = (0, 0, 0)  # Green dots for valid moves
+
+
 
 # Load images
 piece_files = {
@@ -41,13 +42,31 @@ text = font.render("Coming Soon", True, BLACK)
 text_rect = text.get_rect(center=(WINDOW_SIZE//2, WINDOW_SIZE//2))
 
 
+
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-    screen.fill(WHITE)  # fill background
+    board = chess.Board();
+
+
+    # Draw the board:
+    for i in range(8):
+        for j in range(8):
+            if (i+j)%2 == 0:
+              TILE_COLOUR = WHITE
+            else:
+              TILE_COLOUR = BROWN
+            square = pygame.Rect(j*100,i*100,TILE_SIZE,TILE_SIZE)
+            screen.fill(TILE_COLOUR, square, special_flags=0 )
+               
+        
+    
+            
+
+    
     screen.blit(text, text_rect)  # draw text
 
     pygame.display.flip()  # update the display
