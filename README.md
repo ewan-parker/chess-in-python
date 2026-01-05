@@ -8,7 +8,6 @@ uses UCI notation as input.
 [See file](Chess/game.py)
 
 
-### PyGame version:
+### PyGame Testing:
 
-Coming soon.
-[See current](Chess/pygameLaunch.py)
+
