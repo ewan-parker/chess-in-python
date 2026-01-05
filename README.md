@@ -1,7 +1,5 @@
 # Chess In Python
 
-Tests of the python chess library.
-
 ### Console game:
 
 uses UCI notation as input.
