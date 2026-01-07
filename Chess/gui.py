@@ -19,15 +19,40 @@ TILE_COLOR = pygame.Color(255,0,0)
 BACKGROUND_COLOR = pygame.Color(59,59,59)
 HIGHLIGHT_COLOR = (255, 255, 0)
 
+def mouse_at_square(mouse_x, mouse_y):
+    col = (mouse_x - OFFSET_X) // TILE_SIZE
+    row = (mouse_y - OFFSET_Y) // TILE_SIZE
 
+    if 0 <= row < 8 and 0 <= col < 8:
+        return chess.square(col, 7 - row)
+    return None
 
 
 pygame.init()
 
-font = pygame.font.SysFont(None, 95)  # None = default font, 60 = size
-
 screen = pygame.display.set_mode((1600,900),0,0,0,0)
 pygame.display.set_caption("Chess (Python)")
+
+font = pygame.font.SysFont(None, 95)  # None = default font, 60 = size
+
+# images for pieces
+PIECE_IMAGES = {}
+
+piece_map = {
+    'P': 'white_pawn', 'N': 'white_knight', 'B': 'white_bishop',
+    'R': 'white_rook', 'Q': 'white_queen', 'K': 'white_king',
+    'p': 'black_pawn', 'n': 'black_knight', 'b': 'black_bishop',
+    'r': 'black_rook', 'q': 'black_queen', 'k': 'black_king',
+}
+
+for symbol, filename in piece_map.items():
+    img = pygame.image.load(f"Chess/pieces/{filename}.png").convert_alpha()
+    img = pygame.transform.smoothscale(img, (TILE_SIZE, TILE_SIZE))
+    PIECE_IMAGES[symbol] = img
+
+
+
+
 
 board = chess.Board()
 
@@ -35,13 +60,36 @@ clicked_square = None
 
 
 running = True
+
+
+# game loop
 while running:
+
     clock.tick(60)
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-            
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            square = mouse_at_square(*event.pos)
+
+            if square is None:
+                clicked_square = None
+                continue
+
+            if clicked_square is None:
+                piece = board.piece_at(square)
+                if piece and piece.color == board.turn:
+                    clicked_square = square
+            else:
+                move = chess.Move(clicked_square, square)
+                if move in board.legal_moves:
+                    board.push(move)
+                clicked_square = None
+
+
+    # Board & pieces     
     for i in range(8):
         for j in range(8):
             row = i
@@ -61,36 +109,23 @@ while running:
 
             text_color = pygame.Color(0,0,0)
 
+            piece_at_square = chess.square(col, 7 - row)
             
-            
-            if i < 2 or i > 5:
-                initial_square = chess.square(j,7-i)
-                piece_symbol = board.piece_at(initial_square).symbol()
-                text_surface = font.render(piece_symbol, True, text_color, None)
-                x += 27
-                y+= 25
+            piece = board.piece_at(piece_at_square)
+            if piece:
+                piece_symbol = piece.symbol()
+                screen.blit(PIECE_IMAGES[piece.symbol()], (x-2, y))
 
-                
-                screen.blit(text_surface, (x, y))
+    # Highlights
+    if clicked_square is not None:
+        row = 7 - chess.square_rank(clicked_square)
+        col = chess.square_file(clicked_square)
 
-    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            mouse_x, mouse_y = event.pos
-
-            col = (mouse_x - OFFSET_X) // TILE_SIZE
-            row = (mouse_y - OFFSET_Y) // TILE_SIZE
-
-            if 0 <= row < 8 and 0 <= col < 8:
-                clicked_square = (row, col)
-            else:
-                clicked_square = None
-
-    if clicked_square:
-        row, col = clicked_square
         highlight_rect = pygame.Rect(
-        col * TILE_SIZE + OFFSET_X,
-        row * TILE_SIZE + OFFSET_Y,
-        TILE_SIZE,
-        TILE_SIZE
+            col * TILE_SIZE + OFFSET_X,
+            row * TILE_SIZE + OFFSET_Y,
+            TILE_SIZE,
+            TILE_SIZE
         )
         pygame.draw.rect(screen, HIGHLIGHT_COLOR, highlight_rect, 4)   
 
