@@ -1,12 +1,8 @@
 import chess
 import pygame
-import bot1
+import capture_bot 
 
 clock = pygame.time.Clock()
-
-
-
-
 
 # SIZING:
 TILE_SIZE = 100 # size of each square. 
@@ -89,18 +85,27 @@ while running:
                 if piece and piece.color == board.turn:
                     clicked_square = square
             else:
-                move = chess.Move(clicked_square, square)
+                piece = board.piece_at(clicked_square)
+                if piece is None:
+                    clicked_square = None
+                    continue
+
+                # Handle promotion automatically
+                if piece.piece_type == chess.PAWN and chess.square_rank(square) in [0,7]:
+                    move = chess.Move(clicked_square, square, promotion=chess.QUEEN)
+                else:
+                    move = chess.Move(clicked_square, square)
+
                 if move in board.legal_moves:
                     board.push(move)
-
-                    # Schedule bot move
                     bot_move_pending = True
                     bot_move_time = pygame.time.get_ticks() + BOT_DELAY_MS
 
                 clicked_square = None
 
+    # Handle bot move outside event loop
     if bot_move_pending and pygame.time.get_ticks() >= bot_move_time:
-        bot_move = bot1.get_bot_move(board)
+        bot_move = capture_bot.get_bot_move(board)
         if bot_move:
             board.push(bot_move)
         bot_move_pending = False
