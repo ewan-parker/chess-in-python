@@ -7,6 +7,6 @@ uses UCI notation as input.
 
 
 ### PyGame Testing:
-working on a GUI to test features
-<img width="1598" height="868" alt="Screenshot (7)" src="https://github.com/user-attachments/assets/14bed96c-8875-45b3-9ce5-3e0cd5b06c6c" />
 
+
+<img width="1589" height="905" alt="Screenshot (8)" src="https://github.com/user-attachments/assets/e3b54359-c9db-4479-a173-bbe2874d1284" />
