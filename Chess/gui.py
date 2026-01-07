@@ -1,5 +1,6 @@
 import chess
 import pygame
+import bot1
 
 clock = pygame.time.Clock()
 
@@ -18,6 +19,11 @@ BLACK_TILE = pygame.Color(68,67,68)
 TILE_COLOR = pygame.Color(255,0,0) 
 BACKGROUND_COLOR = pygame.Color(59,59,59)
 HIGHLIGHT_COLOR = (255, 255, 0)
+
+# BOT INFO 
+BOT_DELAY_MS = 400   
+bot_move_pending = False
+bot_move_time = 0
 
 def mouse_at_square(mouse_x, mouse_y):
     col = (mouse_x - OFFSET_X) // TILE_SIZE
@@ -86,8 +92,18 @@ while running:
                 move = chess.Move(clicked_square, square)
                 if move in board.legal_moves:
                     board.push(move)
+
+                    # Schedule bot move
+                    bot_move_pending = True
+                    bot_move_time = pygame.time.get_ticks() + BOT_DELAY_MS
+
                 clicked_square = None
 
+    if bot_move_pending and pygame.time.get_ticks() >= bot_move_time:
+        bot_move = bot1.get_bot_move(board)
+        if bot_move:
+            board.push(bot_move)
+        bot_move_pending = False
 
     # Board & pieces     
     for i in range(8):
